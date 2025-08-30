@@ -18,6 +18,12 @@ contract CarbonRetireNFT is ERC721, AccessControl{
 
     }
 
+    function mintCert(address to)external onlyRole(MINTER_ROLE) returns (uint256){
+        uint256 id = ++tokenId;
+        _safeMint(to, id);
+        return id;
+    }
+
   function supportsInterface(bytes4 interfaceId) public view override(AccessControl, ERC721) returns(bool){
     return super.supportsInterface(interfaceId);
   }
