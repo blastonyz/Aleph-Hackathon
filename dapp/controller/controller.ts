@@ -4,6 +4,8 @@ import { UpdateProject } from "@/types/types";
 export const getProjects = async () => {
   try {
     const projects = await projectModel.find({});
+    console.log('projects controller: ',projects);
+    
     return projects;
   } catch (error) {
     console.error("Error fetching projects:", error);

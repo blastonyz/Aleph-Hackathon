@@ -11,7 +11,7 @@ export const ProjectsProvider = ({children}: {children: React.ReactNode}) => {
 
     const getProjects = async () => {
         try {
-            const response = await fetch('/api/list');
+            const response = await fetch('/api/projects');
             if (!response.ok) {
                 throw new Error('Failed to fetch projects');
             }
@@ -32,10 +32,13 @@ export const ProjectsProvider = ({children}: {children: React.ReactNode}) => {
         
     }
 
-    const selectProject = (key: string): Project | null => {
-      return projects.find(project => project.key === key) || null;  
+    const selectProject = (_id: string): Project | null => {
+      const selected =  projects.find(project => project._id === _id) || null;  
+        console.log('selected', selected);
+        return selected
         
     } 
+
     const filterByOwners = () => {
         return projects.filter(project => project.owner !== '')
     }
