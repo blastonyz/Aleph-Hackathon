@@ -7,7 +7,7 @@ import GHToken from '@contracts/GHToken.sol/GHToken.json'
 import CarbonRetire from '@contracts/CarbonRetireNFT.sol/CarbonRetireNFT.json'
 import CarbonProject from "@contracts/CarbonProjectNFT.sol/CarbonProjectNFT.json"
 import CarbonFactory from "@contracts/CarbonFactory.sol/CarbonFactory.json"
-import {addrGHToken}  from '@contracts/adresses'
+import { addrGHToken } from '@contracts/adresses'
 import { addrCarbonFactory } from '@/contracts/adresses'
 import { addrCarbonRetire } from '@/contracts/adresses'
 import { addrCarbonProject } from '@/contracts/adresses'
@@ -23,7 +23,7 @@ type WalletContextType = {
     };
     connectWallet: () => Promise<void>;
     mainProvider: BrowserProvider | null;
-    rpcSigner: JsonRpcSigner | null;
+    mainSigner: JsonRpcSigner | null;
 };
 
 
@@ -37,27 +37,28 @@ type Props = {
 export const ConnectionProvider = ({ children }: Props) => {
     const [account, setAccount] = useState<WalletAddress>(null);
     const [contracts, setContracts] = useState<{
-  GHToken?: Contract;
-  CarbonProjectNFT?: Contract;
-  CarbonRetireNFT?: Contract;
-  CarbonFactory?: Contract;
-}>({});
+        GHToken?: Contract;
+        CarbonProjectNFT?: Contract;
+        CarbonRetireNFT?: Contract;
+        CarbonFactory?: Contract;
+    }>({});
 
     const [mainProvider, setMainProvider] = useState<BrowserProvider | null>(null);
-    const [rpcSigner, setRpcSigner] = useState<JsonRpcSigner | null>(null);
 
-   
+    const [mainSigner, setMainSigner] = useState<JsonRpcSigner | null>(null);
+
+
 
     useEffect(() => {
-        if (mainProvider) {
+        if (mainSigner) {
             setContracts({
-                GHToken: new Contract(addrGHToken, GHToken.abi, mainProvider),
-                CarbonProjectNFT: new Contract(addrCarbonProject, CarbonProject.abi, mainProvider),
-                CarbonRetireNFT: new Contract(addrCarbonRetire, CarbonRetire.abi, mainProvider),
-                CarbonFactory: new Contract(addrCarbonFactory, CarbonFactory.abi, mainProvider),
+                GHToken: new Contract(addrGHToken, GHToken.abi, mainSigner),
+                CarbonProjectNFT: new Contract(addrCarbonProject, CarbonProject.abi, mainSigner),
+                CarbonRetireNFT: new Contract(addrCarbonRetire, CarbonRetire.abi, mainSigner),
+                CarbonFactory: new Contract(addrCarbonFactory, CarbonFactory.abi, mainSigner),
             });
         }
-    }, [mainProvider]);
+    }, [mainSigner]);
 
 
     useEffect(() => {
@@ -74,7 +75,7 @@ export const ConnectionProvider = ({ children }: Props) => {
                 setMainProvider(provider);
 
                 const signer = await provider.getSigner();
-                setRpcSigner(signer);
+                setMainSigner(signer);
 
             }
         };
@@ -107,7 +108,14 @@ export const ConnectionProvider = ({ children }: Props) => {
         }
     }
     return (
-        <WalletContext.Provider value={{ account, contracts, connectWallet, mainProvider, rpcSigner }}>
+        <WalletContext.Provider
+            value={{
+                account,
+                contracts,
+                connectWallet,
+                mainProvider,
+                mainSigner
+            }}>
             {children}
         </WalletContext.Provider>
     );

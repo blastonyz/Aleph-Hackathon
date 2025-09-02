@@ -75,7 +75,7 @@ contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
         string calldata baseURI_,
         address minter_
     ) external {
-        require(!_initialized,"initialized");
+        require(!_initialized,"already initialized");
         require(admin != address(0),"admin=0");
         require(_paymentToken != address(0), "paymentToken=0");
         require(_treasury != address(0),"treasury=0");

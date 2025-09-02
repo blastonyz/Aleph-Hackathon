@@ -1,7 +1,8 @@
 import { Project } from "@/types/types";
 import Link from "next/link"
 import { MapPin, DollarSign, TrendingUp, Leaf } from "lucide-react"
-
+import DeployERC721 from "../../interactions/deploy721/DeployERC721";
+import BuyNFT from "../../interactions/buy/BuyNFT";
 
 type Props = {
     project:Project;
@@ -99,18 +100,18 @@ const ProjectCard = ({project}:Props) => {
         {/* Description Preview */}
         <p className="text-green-600 text-sm leading-relaxed">{project.short_description}</p>
 
-        {/*!project.isTokenized && project.ERC721Deployer && (
+        {!project.isTokenized &&  (
           <div className="pt-4 border-t border-green-100">
-            <project.ERC721Deployer project={project} />
+            <DeployERC721 project={project} />
           </div>
-        )*/}
+        )}
 
-        {/*project.isTokenized && project.contractAddress && (
+        {project.isTokenized && project.contractAddress && (
           <div className="pt-4 border-t border-green-100 space-y-3">
-            {project.BuyNft && <project.BuyNft nftAddress={project.contractAddress} price={project.price} />}
-            {project.RetireCredits && <project.RetireCredits tokenAddress={project.contractAddress} />}
+            {BuyNFT && <BuyNFT nftAddress={project.contractAddress} price={project.price} />}
+            {/*project.RetireCredits && <project.RetireCredits tokenAddress={project.contractAddress} />*/}
           </div>
-        )*/}
+        )}
       </div>
     </div>
   )

@@ -9,7 +9,7 @@ async function main() {
     await carbonNFT.waitForDeployment();
     const address = await carbonNFT.getAddress();
 
-    console.log(`CarbonRetireNFT deployed at: ${address}`);
+    console.log(`CarbonProjectNFT deployed at: ${address}`);
 
 }
 
