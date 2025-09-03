@@ -7,14 +7,13 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {CarbonRetireNFT} from "./CarbonRetireNFT.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-
-contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
-     // Roles
+contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl {
+    // Roles
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     // Payment token (GHC-like)
     IERC20 public paymentToken; // CarbonToken clone address
-    
+
     // Retirement certificate contract to mint when burning
     CarbonRetireNFT public retireContract;
 
@@ -28,7 +27,7 @@ contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
     uint256 public price; // price in paymentToken per NFT (units aligned with token decimals)
     uint256 public maxSupply; // cap of NFTs for this project
     uint256 public mintedCount; // minted so far
-    string  private baseURI;
+    string private baseURI;
 
     // Flags
     bool public enforceNoResale; // if true, disallow transfers after minting
@@ -50,15 +49,15 @@ contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
         uint256 indexed tokenId,
         uint256 retireCertId
     );
-   event TransferTrace(
+    event TransferTrace(
         uint256 indexed projectId,
         uint256 indexed tokenId,
         address indexed from,
         address to
     );
 
-    constructor() ERC721("CarbonProject","CPNFT"){
-         // implementation constructor - clones will call initialize
+    constructor() ERC721("CarbonProject", "CPNFT") {
+        // implementation constructor - clones will call initialize
     }
 
     function initialize(
@@ -75,10 +74,10 @@ contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
         string calldata baseURI_,
         address minter_
     ) external {
-        require(!_initialized,"already initialized");
-        require(admin != address(0),"admin=0");
+        require(!_initialized, "already initialized");
+        require(admin != address(0), "admin=0");
         require(_paymentToken != address(0), "paymentToken=0");
-        require(_treasury != address(0),"treasury=0");
+        require(_treasury != address(0), "treasury=0");
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(MINTER_ROLE, minter_);
 
@@ -98,16 +97,27 @@ contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
     }
 
     // internal baseURI helper using ERC721URIStorage's _setTokenURI per token; we will use tokenURIs per token
-  function _baseURI() internal view override returns (string memory) {
-    return baseURI;
-}
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
+    }
 
-    function buy() external nonReentrant returns(uint256){
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return baseURI;
+    }
+
+
+    function getBaseURI() external view returns (string memory) {
+    return baseURI;
+    }
+
+
+    function buy() external nonReentrant returns (uint256) {
         require(_initialized, "not init");
         require(mintedCount < maxSupply, "sold out");
         require(price > 0, "free? use mint role");
         address buyer = msg.sender;
-         // transfer payment from buyer to treasury
+        // transfer payment from buyer to treasury
         require(
             paymentToken.transferFrom(buyer, treasury, price),
             "payment failed"
@@ -124,28 +134,28 @@ contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
         return tid;
     }
 
-    function adminMint(address to) external onlyRole(MINTER_ROLE) returns(uint256){
-        require(mintedCount < maxSupply,"maxSupply");
+    function adminMint(
+        address to
+    ) external onlyRole(MINTER_ROLE) returns (uint256) {
+        require(mintedCount < maxSupply, "maxSupply");
         uint256 tid = ++nextTokenId;
         mintedCount += 1;
         _safeMint(to, tid);
         return tid;
     }
 
-    function adminMintBatch(uint256 amount) external onlyRole(MINTER_ROLE){
-        require(mintedCount + amount < maxSupply,"cap exceded");
-        for(uint256 i = 0; i < amount;++i){
+    function adminMintBatch(uint256 amount) external onlyRole(MINTER_ROLE) {
+        require(mintedCount + amount < maxSupply, "cap exceded");
+        for (uint256 i = 0; i < amount; ++i) {
             uint256 tid = ++nextTokenId;
             mintedCount += 1;
             _safeMint(msg.sender, tid);
-            emit Purchased(msg.sender, tid, 0);// price = 0 for admin mint;
+            emit Purchased(msg.sender, tid, 0); // price = 0 for admin mint;
         }
     }
-    
-       // Burn token to retire: holder burns their token and receives retirement certificate
-    function retire(
-        uint256 tokenId
-    ) external returns (uint256) {
+
+    // Burn token to retire: holder burns their token and receives retirement certificate
+    function retire(uint256 tokenId) external returns (uint256) {
         require(ownerOf(tokenId) == msg.sender, "not owner");
         // burn
         _burn(tokenId);
@@ -169,9 +179,9 @@ contract CarbonProjectNFT is ReentrancyGuard, ERC721, AccessControl{
         emit TransferTrace(projectId, tokenId, from, to);
     }
 
-
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721,AccessControl) returns(bool){
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
- 
 }

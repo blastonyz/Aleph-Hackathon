@@ -1,7 +1,8 @@
 import { parseUnits } from 'ethers';
 import { Project } from '@/types/types';
 import { Contract } from 'ethers';
-import { JsonRpcSigner } from 'ethers';
+
+
 
 export async function deployProject({
   name,
@@ -76,8 +77,12 @@ export function buildDeployParamsFromProject(
   retireAddress: string,
   factoryContract: Contract
 ) {
+
   const maxSupply = Math.floor(project.stats.totalSupply - project.stats.totalRetired);
 
+
+  console.log('maxSUp: ',maxSupply);
+  
   return {
     name: project.name,
     symbol: project.symbol || project.registry,
@@ -89,8 +94,8 @@ export function buildDeployParamsFromProject(
     price: project.price,
     maxSupply,
     enforceNoResale: false,
-    metadataURI: cid,
-    factoryContract,
+    metadataURI: `ipfs://${cid}`,
+    factoryContract
   };
 }
 
@@ -99,7 +104,7 @@ export function  buildMetadata(project: Project,imageCID: string = "bafkreiawez4
   return {
     name: `Carbon Credit #1`,
     description: `1 ton of CO₂ offset from ${project.name}`,
-    image: `${imageCID}`,
+    image: `ipfs://${imageCID}`,
     attributes: [
       { trait_type: "Project", value: project.name },
       { trait_type: "Carbon Offset", value: "1 ton" },

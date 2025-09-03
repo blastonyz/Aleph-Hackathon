@@ -20,20 +20,24 @@ const BuyNFT = ({ nftAddress, price }: Props) => {
 
 
 
+
     const buy = async () => {
         console.log('buying');
-
+        console.log("Raw price string:", price);
         if (!mainSigner || !account || !paymentToken || !carbonToken) {
             return setError("🔒 Connect your wallet to continue");
         }
 
         const amount = parseUnits(price, 18);
+        console.log('amount: ', amount);
+        const max = await carbonToken.maxSupply()
+        console.log("maxSupply:", max.toString());
+
 
         const balance = await paymentToken.balanceOf(account);
         if (balance <= amount) {
-             setError("❌ Insufficient token balance to proceed with purchase");
-  return;
-
+            setError("❌ Insufficient token balance to proceed with purchase");
+            return;
         }
 
         try {
@@ -41,9 +45,6 @@ const BuyNFT = ({ nftAddress, price }: Props) => {
             const allowance = await paymentToken.allowance(account, nftAddress);
             console.log('allowance: ', allowance);
 
-            
-
-            console.log('amount: ', amount);
 
             if (allowance < amount) {
                 const grantAllowance = await paymentToken.approve(nftAddress, amount);
@@ -55,9 +56,16 @@ const BuyNFT = ({ nftAddress, price }: Props) => {
                 console.log("✅ Allowance already sufficient");
             }
 
-            const buyResponse = await carbonToken.buy()
-            const buyReceipt = await buyResponse.wait()
-            console.log('buy receipt: ', buyReceipt);
+            try {
+                console.log('prev buy');
+                
+                const buyResponse = await carbonToken.buy();
+                const buyReceipt = await buyResponse.wait();
+                console.log("buy receipt:", buyReceipt);
+            } catch (err) {
+                console.error("❌ Buy failed:", err);
+                setError("Buy transaction reverted");
+            }
 
 
         } catch (error) {
@@ -67,18 +75,18 @@ const BuyNFT = ({ nftAddress, price }: Props) => {
 
     return (
         <div>
-             <button
-            onClick={buy}
-            disabled={!account}
-            className={`px-4 py-2 rounded font-semibold transition ${!account
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
-        >
-            BuyNft
-        </button>
+            <button
+                onClick={buy}
+                disabled={!account}
+                className={`px-4 py-2 rounded font-semibold transition ${!account
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                    }`}
+            >
+                BuyNft
+            </button>
 
-       { error && <p>{error}</p>}
+            {error && <p>{error}</p>}
 
         </div>
     );

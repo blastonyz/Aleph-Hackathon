@@ -31,8 +31,6 @@ const DeployERC721 = ({ project }: Props) => {
         setError(null);
         setResult(null);
 
-
-
         if (!account) {
             setError("Wallet not connected");
             return;
