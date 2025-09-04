@@ -4,6 +4,7 @@ import { parseUnits } from "ethers";
 import { Contract } from "ethers";
 import CarbonProjectNFT from "@contracts/CarbonProjectNFT.sol/CarbonProjectNFT.json"
 import { useState } from "react";
+import { toWeiDecimal } from "../deploy721/DeployFunctions";
 
 type Props = {
     nftAddress: string;
@@ -28,7 +29,7 @@ const BuyNFT = ({ nftAddress, price }: Props) => {
             return setError("🔒 Connect your wallet to continue");
         }
 
-        const amount = parseUnits(price, 18);
+        const amount = toWeiDecimal(price);
         console.log('amount: ', amount);
         const max = await carbonToken.maxSupply()
         console.log("maxSupply:", max.toString());
@@ -58,13 +59,24 @@ const BuyNFT = ({ nftAddress, price }: Props) => {
 
             try {
                 console.log('prev buy');
-                
+
+                try {
+                    await carbonToken.buy.staticCall();
+                    console.log("✅ buy puede ejecutarse");
+                } catch (err) {
+                    console.error("❌ buy revertiría:", err);
+                }
                 const buyResponse = await carbonToken.buy();
                 const buyReceipt = await buyResponse.wait();
                 console.log("buy receipt:", buyReceipt);
-            } catch (err) {
+            } catch (err: any) {
                 console.error("❌ Buy failed:", err);
                 setError("Buy transaction reverted");
+                if (err.error && err.error.message) {
+                    console.error("Revert reason:", err.error.message)
+                } else {
+                    console.error("Error object:", err)
+                }
             }
 
 

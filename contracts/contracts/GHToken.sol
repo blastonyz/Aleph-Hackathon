@@ -12,7 +12,7 @@ contract GHToken is ERC20, AccessControl{
 
     event TokenMinted(address indexed to, uint256 amount, string context);
 
-    constructor() ERC20("GHToken","GHT"){
+    constructor() ERC20("GH COIN","GHC"){
         admin = msg.sender;
         require(admin != address(0), "admin=0");
         initialized = true;

@@ -25,14 +25,12 @@ export async function deployProject({
   paymentToken: string;
   retireContract: string;
   treasury: string;
-  price: string | number;
-  maxSupply: number;
+  price: BigInt;
+  maxSupply: BigInt;
   enforceNoResale: boolean;
   metadataURI: string;
   factoryContract: any;
 }) {
-  const safePrice = Number(price).toFixed(18);
-  const priceInUnits = parseUnits(safePrice.toString(), 18);
 
   const tx = await factoryContract.createProjectClone(
     name,
@@ -42,7 +40,7 @@ export async function deployProject({
     paymentToken,
     retireContract,
     treasury,
-    priceInUnits,
+    price,
     maxSupply,
     enforceNoResale,
     metadataURI
@@ -78,8 +76,8 @@ export function buildDeployParamsFromProject(
   factoryContract: Contract
 ) {
 
-  const maxSupply = Math.floor(project.stats.totalSupply - project.stats.totalRetired);
-
+  const maxSupply = BigInt(Math.floor(project.stats.totalSupply - project.stats.totalRetired));
+  const price = toWeiDecimal(project.price);
 
   console.log('maxSUp: ',maxSupply);
   
@@ -91,7 +89,7 @@ export function buildDeployParamsFromProject(
     paymentToken: erc20address,
     retireContract: retireAddress,
     treasury: account,
-    price: project.price,
+    price,
     maxSupply,
     enforceNoResale: false,
     metadataURI: `ipfs://${cid}`,
@@ -113,3 +111,8 @@ export function  buildMetadata(project: Project,imageCID: string = "bafkreiawez4
   };
 }
 
+export function toWeiDecimal(str: string): bigint {
+  const [whole, fraction = ""] = str.split(".");
+  const paddedFraction = (fraction + "0".repeat(18)).slice(0, 18);
+  return BigInt(whole) * BigInt(10 ** 18) + BigInt(paddedFraction);
+}

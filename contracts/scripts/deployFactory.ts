@@ -7,9 +7,9 @@ async function main(){
     const factory = await ethers.getContractFactory('CarbonFactory')
     const factoryDeployed = await factory.deploy(
         '0x0571235134DC15a00f02916987C2c16b5fC52E2A',
-        '0xCb82F628420870C4502798c7BDbcaE7aB165Dc3B',
-        '0x566aF61A5a0D58201221B99C503d5b1B434f0820',
-        '0x6FeD3c8e713AD97faEc3E1aBB46cec4c9Fa574A8'
+        '0x6dD981011635aB024661610BceA9DA8b0586e4d6',
+        '0x8C6B1ffE600721eA0bdB782D18f2fB904d0b8E9b',
+        '0xF4AD022E2D3D8a4d5c63cd10A588D35aF047d53d'
     );
 
     await factoryDeployed.waitForDeployment()
@@ -20,4 +20,3 @@ main().catch((error) => {
   console.error("❌ Deployment failed:", error);
   process.exit(1);
 });
-//0xC018B88f78691d2Fd31c8168a7d60884E6e6F074

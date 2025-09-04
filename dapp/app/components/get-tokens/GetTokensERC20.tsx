@@ -28,7 +28,7 @@ const GetTokensERC20 = () => {
                     type: "ERC20",
                     options: {
                         address: addrGHToken,
-                        symbol: "GHT",
+                        symbol: "GHC",
                         decimals: 18
                     },
                 },

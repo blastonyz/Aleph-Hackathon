@@ -100,6 +100,13 @@ const ProjectCard = ({project}:Props) => {
         {/* Description Preview */}
         <p className="text-green-600 text-sm leading-relaxed">{project.short_description}</p>
 
+          {project?.owner &&
+           <p className="text-xs text-green-500">Owned by: {project.owner}
+           </p>}
+
+          {project.contractAddress &&
+           <p className="text-xs text-green-500">Contract: {project.contractAddress}
+           </p>}
         {!project.isTokenized &&  (
           <div className="pt-4 border-t border-green-100">
             <DeployERC721 project={project} />
